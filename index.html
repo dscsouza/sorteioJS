@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteio</title>
+
+<script>
+var posicao = 0;
+// inicializa o array que armazenará a lista
+var listaCompleta = []
+
+// pega os dados salvos no localStorage e salva em ItensSalvos
+var ItensSalvos = JSON.parse(localStorage.getItem("tarefas"))
+//caso haja dados salvos no localStorage, exibe no console
+if (ItensSalvos !=null){console.log(ItensSalvos)}
+
+
+
+
+// chama uma função anônima ao carregar a página completamente
+onload = function(){
+
+    if (ItensSalvos !=null){
+
+        //inicialmente percorre um a um os elementos do array ItensSalvos que comtém os dados salvos do localStorage "tarefas"
+        for (i of ItensSalvos){
+            insere_tarefa(i);
+
+
+            //CONTROLE - mostra no console o array com todos os dados
+            console.log(listaCompleta)
+
+        }
+    }
+}
+
+
+function insere_tarefa(coisa){
+        //pega a tag <ul> e salva como objeto em list
+        var list = document.getElementById("lista")
+        console.log("objeto list")
+        console.log(list)
+        
+        // cria o item da listagem
+        const criarItem = document.createElement("li")
+        list.appendChild(criarItem);
+
+        //única linha diferente
+        criarItem.appendChild(document.createTextNode(coisa))
+
+
+
+        criarItem.setAttribute("class", "tarefa_lista");
+
+        // Ao passar o mouse pelo item da lista(onmouseover), exibe a imagem de excluir
+        // ao retirar o mouse (onmouseout), oculta o a imagem de excluir
+        criarItem.setAttribute("onmouseover", "move_li(this)");
+        criarItem.setAttribute("onmouseout", "oculta_li(this)");     
+
+
+        // cria a tag <a> link na <li> para excluir a tarefa
+        var linkExcluir = document.createElement("a")
+        criarItem.appendChild(linkExcluir)
+
+        //inclui a tag <img> para exibir a imagem da lixeira
+        var imgExcluir = document.createElement("img")
+        linkExcluir.appendChild(imgExcluir)
+        //insere os atributos src (caminho da imagem, class ("apagar") e onclick (chama a função excluirTarefa) passando o argumento this para excluir a tag correspondente
+        imgExcluir.setAttribute("src", "excluir.png");
+        linkExcluir.setAttribute("class", "apagar");
+
+        // ao clicar na imagem ele passa a posição do item como atributo para ser usado na hora de excluir
+        linkExcluir.setAttribute("onclick","excluirTarefa("+posicao+",this)")
+        posicao ++;
+        
+        //grava o item no array listaCompleta
+        listaCompleta.push(coisa)
+}
+
+
+function enviarTarefa(){
+    // inicializa as variáveis:
+    // tarefa que recebe o obj do input
+    // coisa recebe o conteúdo do input
+    tarefa = document.getElementById("coisaFazer");
+    coisa = tarefa.value;
+
+    // se o input não estiver vazio
+    if (coisa != ''){
+        // inclui o item e exibe a lista
+        insere_tarefa(coisa);
+
+        console.log(listaCompleta);
+
+
+        localStorage.setItem("tarefas", JSON.stringify(listaCompleta));
+        tarefa.value = "";
+
+
+    } else {
+        alert("Digite pelo menos um participante...")
+
+    }
+
+
+}
+
+
+function limpar(){
+    // limpa a <ul> 
+    document.getElementById("lista").innerHTML="Participantes";
+    //limpa o local storage
+    localStorage.clear();
+    listaCompleta = [];
+}
+
+
+function excluirTarefa(pos, posItem){
+    console.log("-*-*-* clicado -*-*-*");
+    console.log(pos)
+
+    // let index = listaCompleta.indexOf(pos)
+    // if (index > -1){
+        listaCompleta.splice(pos,1);
+        localStorage.setItem("tarefas", JSON.stringify(listaCompleta));
+    // } else {
+    //     alert("Houve algum erro.")
+    // }
+
+    let x = posItem.parentNode;
+    console.log("item a ser excluído");
+    console.log(x)
+    x.innerHTML = ""
+    x.remove();   
+
+
+}
+
+//monitora se enter é pressionado e salva a tarefa
+addEventListener('keypress',e=>{
+    if(e.key=="Enter") enviarTarefa()
+})
+
+
+//exibe o icone apagar ao passar pela linha
+function move_li(e){
+    let x = e.querySelectorAll(".apagar > img");
+    x[0].style.display = "inline-block"
+}
+
+// oculta o íncone apagar assim que o cursor sai da linha pela linha
+function oculta_li(e){
+    let x = e.querySelectorAll(".apagar > img");
+    x[0].style.display = "none"
+}
+
+
+function sortear(){
+
+
+    let participantes = listaCompleta.length;
+
+    numero_sorteado = Math.ceil(Math.random() * participantes);
+
+    console.log(numero_sorteado);
+    console.log(listaCompleta[numero_sorteado-1]);
+
+    s = document.getElementById("sorteado");
+    s.innerHTML = "Participante Sorteado: " + (listaCompleta[numero_sorteado-1]);
+
+    
+
+}
+
+</script>
+
+<style>
+
+@media (max-width: 400px)
+{
+.container{
+    width: 100%;
+}
+
+}
+body{
+    
+    margin: 10px;
+    padding:0px;
+}
+
+.container{
+    
+    border: 2px solid red;
+    border-radius: 5%;
+    text-align: center;
+    display: inline-block;
+    
+    overflow:auto;
+    background: linear-gradient(rgb(38, 0, 128), rgba(0, 0, 139, 0.671));
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+}
+h2{
+    font-size: 1.5rem;
+    color: white;
+    text-transform: uppercase;
+	font-weight: 500;
+	color: #fff;
+    text-shadow: slategray;
+    
+}
+
+.Tarefas{
+    display: flex;
+    justify-content: center;
+    height: 80%;
+}
+
+ol{
+    width: 100%;
+    text-align: center;
+    margin: 0px;
+    font-size: 1.2rem;
+    color: white;
+    text-transform: uppercase;
+	font-weight: 300;
+	color: #fff;
+    
+}
+
+
+li{
+    text-align: left;
+    width: 100%;
+    margin:0px;
+    font-size: 1rem;
+    color: white;
+    text-transform: uppercase;
+	font-weight: 300;
+	color: #fff;
+}
+
+li:hover{
+    color:red;
+
+        
+}
+
+li a{
+    float: right;
+}
+img{
+    display:none;
+    float:inline-end;
+    width: 30px;
+}
+
+img:hover{
+    overflow:hidden;
+    cursor: pointer;
+}
+
+.rodape{
+    text-align: center;
+    text-shadow:lightslategrey;
+    font-size: 8px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: blue;
+}
+button{
+    /* height: 30px;
+    font-size: 14px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius: 10%;
+    border: 3px solid blue;
+    background-color: blue;
+    color: white; */
+
+
+
+
+    padding: 5px;
+	width: 40%;
+    height: 35px;
+	margin: 5px auto;
+	border-radius: 10px;
+	border: 3px;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: #fff;
+	background: linear-gradient(to right, orangered, orange);
+	cursor: pointer;
+}
+button:hover{
+    border: 3px solid rgba(255, 0, 0, 0.829);
+    cursor: pointer;
+}
+
+
+
+.botao{
+    background: linear-gradient(to right, rgb(5, 5, 5), rgba(65, 49, 20, 0.774));
+}
+
+input{
+    /* padding: 2px;
+    height: 25px;
+    border-radius: 1%; */
+
+    width: 80%;
+	margin: 0 auto;
+	padding: 10px;
+	border: none;
+	margin-bottom: 10px;
+	border-radius: 10px;
+    font-size: 16px;
+
+}
+.sorteio{
+    width: 250px;
+    display: block;
+   float:none;
+   text-align: center;
+   margin-left: auto;
+   margin-right: auto;
+   margin-top: 5px;
+   margin-bottom: 5px;
+}
+
+
+</style>
+
+</head>
+<body>
+    
+<div class="container"><img class = "sorteio" src="sorteio.png" alt="">
+    <input placeholder = "Digite o nome de cada participante..." id = "coisaFazer" type="text"> 
+    <button class="botao" id = "incluir" onclick="enviarTarefa()" alt="Clique aqui para incluir ou pressione enter">Incluir Participante</button>
+    <button class="botao" onclick="limpar()">Limpar a Lista</button>
+    <button onclick="sortear()">Sortear</button>
+    <h2 id="sorteado">Participante Sorteado: </h2>
+
+
+    <br><br>
+<div class="Tarefas">
+    <ol id = "lista">PARTICIPANTES</ol>
+    
+</div>
+<br><br>
+<p class="rodape">Desenvolvido por Deyvison Souza Castelo</p>
+</div>
+
+</body>
+</html>
