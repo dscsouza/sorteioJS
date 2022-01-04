@@ -161,6 +161,7 @@ function sortear(){
 
 
     let participantes = listaCompleta.length;
+    if (listaCompleta != 0){
 
     numero_sorteado = Math.ceil(Math.random() * participantes);
 
@@ -169,6 +170,9 @@ function sortear(){
 
     s = document.getElementById("sorteado");
     s.innerHTML = "Participante Sorteado: " + (listaCompleta[numero_sorteado-1]);
+    } else {
+	    alert("Inclua pelo menos um participante no sorteio.")
+    }
 
     
 
